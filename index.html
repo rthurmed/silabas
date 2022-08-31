@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset='utf-8'>
+  <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+  <title>Silabas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.5/dist/umd/popper.min.js" integrity="sha384-Xe+8cL9oJa6tN/veChSP7q+mnSPaj5Bcu9mPX5F5xIGE0DVittaqT5lorf0EI7Vk" crossorigin="anonymous" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.min.js" integrity="sha384-ODmDIVzN+pFdexxHEHFBQH3/9/vQ9uori45z4JjnFsRydbmQbmL5t1tQ0culUzyK" crossorigin="anonymous" defer></script>
+</head>
+<body class="container my-5 d-grid gap-4">
+  <div class="text-center">
+    <h1>Contador de silabas</h1>
+    <span class="text-muted">*Não funciona com silabas</span>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <label for="inputData">
+        Entrada de dados
+      </label>
+    </div>
+    <div class="card-body">
+      <form class="d-grid gap-2">
+        <div>
+          <textarea class="form-control" id="inputData" name="words" rows="6" autofocus></textarea>
+          <span class="text-muted">
+            Separar palavras com ";". Ainda não suporta acentos.
+          </span>
+        </div>
+        <button class="btn btn-primary btn-lg" type="submit">Enviar</button>
+      </form>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      Resultado
+    </div>
+    <div class="table-responsive">
+      <table class="table table-striped">
+        <thead id="tableHeader">
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">First</th>
+            <th scope="col">Last</th>
+            <th scope="col">Handle</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <tr>
+            <th scope="row">1</th>
+            <td>Mark</td>
+            <td>Otto</td>
+            <td>@mdo</td>
+          </tr>
+          <tr>
+            <th scope="row">2</th>
+            <td>Jacob</td>
+            <td>Thornton</td>
+            <td>@fat</td>
+          </tr>
+          <tr>
+            <th scope="row">3</th>
+            <td colspan="2">Larry the Bird</td>
+            <td>@twitter</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <script>
+    const WORDS_PARAMS = 'words'
+    const ALPHABET = 'abcdefghijklmnopqrstuvwxyz'
+    const ALPHABET_ARRAY = ALPHABET.split('')
+    const LETTER_COUNT_OBJ = Object.fromEntries(ALPHABET_ARRAY.map(letter => ([ letter, 0 ])))
+
+    // TODO: remover acentos
+
+    const getQuery = () => {
+      const queryObject = {}
+      const queryString = window.location.search.substr(1)
+      queryString
+        .split('&')
+        .forEach((param) => {
+          const [label, value] = param.split('=')
+          queryObject[label] = decodeURIComponent(value)
+        })
+      return queryObject
+    }
+
+    const calcLetterCount = (word = '') => {
+      const counts = { ...LETTER_COUNT_OBJ }
+      for (let i = 0; i < word.length; i++) {
+        const letter = word[i]
+        counts[letter] += 1
+      }
+      return counts
+    }
+
+    const buildTableHeader = (parentId, words = []) => {
+      const parent = document.getElementById(parentId)
+      parent.innerHTML = `
+        <tr>
+          <th scope="col">#</th>
+          ${
+            words
+              .map(word => `<th scope="col">${word}</th>`)
+              .join('')
+          }
+        </tr>
+      `
+    }
+
+    const buildTableBody = (parentId, words = []) => {
+      const parent = document.getElementById(parentId)
+      const counts = words.map(calcLetterCount)
+      parent.innerHTML = (
+        ALPHABET_ARRAY
+          .map(letter => `
+            <tr>
+              <th scope="row">${letter}</th>
+              ${
+                counts
+                  .map(count => `<td>${count[letter]}</td>`)
+                  .join('')
+              }
+            </tr>
+          `)
+          .join('')
+      )
+    }
+
+    const main = () => {
+      const query = getQuery()
+
+      if (WORDS_PARAMS in query === false) {
+        return
+      }
+
+      const wordsQuery = query[WORDS_PARAMS]
+      const words = wordsQuery.split(';')
+
+      // preenche a textarea com o valor anterior
+      document.getElementById('inputData').value = wordsQuery
+
+      buildTableHeader('tableHeader', words)
+      buildTableBody('tableBody',  words)
+    }
+
+    main()
+  </script>
+</body>
+</html>
