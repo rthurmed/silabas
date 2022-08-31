@@ -70,7 +70,7 @@
   </div>
   <script>
     const WORDS_PARAMS = 'words'
-    const ALPHABET = 'abcdefghijklmnopqrstuvwxyz'
+    const ALPHABET = 'abcdefghijklmnopqrstuvwxyz'.toUpperCase()
     const ALPHABET_ARRAY = ALPHABET.split('')
     const LETTER_COUNT_OBJ = Object.fromEntries(ALPHABET_ARRAY.map(letter => ([ letter, 0 ])))
 
@@ -88,8 +88,9 @@
       return queryObject
     }
 
-    const calcLetterCount = (word = '') => {
+    const calcLetterCount = (originalWord = '') => {
       const counts = { ...LETTER_COUNT_OBJ }
+      const word = originalWord.toUpperCase()
       for (let i = 0; i < word.length; i++) {
         const letter = word[i]
         counts[letter] += 1
